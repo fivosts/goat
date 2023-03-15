@@ -25,3 +25,7 @@ old/*
 *.dot
 
 .DS_Store
+
+.idea
+repos
+results

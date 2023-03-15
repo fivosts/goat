@@ -1,0 +1,3 @@
+[submodule "gobench"]
+	path = gobench
+	url = https://github.com/CarlosRosuero/gobench

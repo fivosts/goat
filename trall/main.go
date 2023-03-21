@@ -26,12 +26,10 @@ func main() {
 					}
 				},
 			},
-			Type:   type_,
-			BugIDs: []string{"etcd_11982"},
+			Type: type_,
 		})
 		s.Run()
 		bugs := s.BugSet.ListByTypes(type_)
-		println(bugs[len(bugs)-1].ID)
 		for _, b := range bugs {
 			pathToTrace := utils.PathToTrace(b.Type.String(), b.SubType, b.SubSubType, b.ID)
 			if s.GetResult(b.ID).IsPositive() {

@@ -1,15 +1,15 @@
 package main
 
-import(
-  "github.com/staheri/goatlib/instrument"
-  "github.com/staheri/goatlib/traceops"
-  "github.com/staheri/goat/evaluate"
-  "fmt"
-  "os"
-  //"strconv"
-  "strings"
-  //"bufio"
-  "path/filepath"
+import (
+	"fmt"
+	"github.com/staheri/goat/evaluate"
+	"github.com/staheri/goatlib/instrument"
+	"github.com/staheri/goatlib/traceops"
+	"os"
+	//"strconv"
+	"strings"
+	//"bufio"
+	"path/filepath"
 )
 
 /*func experiment(path string,iter int,w *bufio.Writer) map[int][]db.Report{
@@ -99,83 +99,78 @@ import(
   return ret
 }*/
 
-
-
 // generate the pdfs from success and fail trace
-func customVis(bugpath, tool_id string, withStack bool){
-  reportFolder := "results/blocking_conf_blocking_all_1000"
-  visualFolder := "/Volumes/DATA/goatws/visuals"
-  //outFolder := "execVis"
-  identifier := "blocking"
+func customVis(bugpath, tool_id string, withStack bool) {
+	reportFolder := "results/blocking_conf_blocking_all_1000"
+	visualFolder := "/Volumes/DATA/goatws/visuals"
+	//outFolder := "execVis"
+	identifier := "blocking"
 
-  causes := evaluate.ReadGoKerConfig(identifier)
-  //fmt.Println(causes)
-  // extract bug info
-  bugFullName := instrument.GobenchAppNameFolder(bugpath) // bugType_BugAppName_BugCommitID
-  bugName := strings.Split(bugFullName,identifier+"_")[1]
-  if bugName == ""{
-    panic("wrong bugName")
-  }
-  mainExp := &evaluate.RootExperiment{}
-  // create bug now
-  fmt.Println("BugName:",bugName,", path: ",bugpath,", fullname: ",bugFullName)
-  target := &evaluate.Bug{bugName,bugpath,identifier,causes[bugName][0],causes[bugName][1]}
-  mainExp.Bug = target
-  mainExp.Exps = make(map[string]evaluate.Ex)
-  mainExp.ReportJSON = fmt.Sprintf("%s/blocking_%s_T100.json",reportFolder,bugName)
-  // create experiment from json files
-  if !checkFile(mainExp.ReportJSON){
-    panic("unable to read json report")
-  }
-  mainExp.Exps = evaluate.ReadResults(mainExp.ReportJSON)
-  fmt.Println("File Found")
+	causes := evaluate.ReadGoKerConfig(identifier)
+	//fmt.Println(causes)
+	// extract bug info
+	bugFullName := instrument.GobenchAppNameFolder(bugpath) // bugType_BugAppName_BugCommitID
+	bugName := strings.Split(bugFullName, identifier+"_")[1]
+	if bugName == "" {
+		panic("wrong bugName")
+	}
+	mainExp := &evaluate.RootExperiment{}
+	// create bug now
+	fmt.Println("BugName:", bugName, ", path: ", bugpath, ", fullname: ", bugFullName)
+	target := &evaluate.Bug{bugName, bugpath, identifier, causes[bugName][0], causes[bugName][1]}
+	mainExp.Bug = target
+	mainExp.Exps = make(map[string]evaluate.Ex)
+	mainExp.ReportJSON = fmt.Sprintf("%s/blocking_%s_T100.json", reportFolder, bugName)
+	// create experiment from json files
+	if !checkFile(mainExp.ReportJSON) {
+		panic("unable to read json report")
+	}
+	mainExp.Exps = evaluate.ReadResults(mainExp.ReportJSON)
+	fmt.Println("File Found")
 
-  gex := mainExp.Exps[tool_id].(*evaluate.GoatExperiment)
-  if gex.LastFailedTrace != ""{
-    outp := fmt.Sprintf("%v/FAIL_%v",visualFolder,strings.Split(filepath.Base(gex.LastFailedTrace),".trace")[0])
-    traceops.ExecVis(gex.LastFailedTrace,filepath.Join(gex.PrefixDir,"bin",gex.BinaryName),outp,withStack)
-  }
-  if gex.LastSuccessTrace != ""{
-    outp := fmt.Sprintf("%v/SUCC_%v",visualFolder,strings.Split(filepath.Base(gex.LastSuccessTrace),".trace")[0])
-    traceops.ExecVis(gex.LastSuccessTrace,filepath.Join(gex.PrefixDir,"bin",gex.BinaryName),outp,withStack)
-  }
+	gex := mainExp.Exps[tool_id].(*evaluate.GoatExperiment)
+	if gex.LastFailedTrace != "" {
+		outp := fmt.Sprintf("%v/FAIL_%v", visualFolder, strings.Split(filepath.Base(gex.LastFailedTrace), ".trace")[0])
+		traceops.ExecVis(gex.LastFailedTrace, filepath.Join(gex.PrefixDir, "bin", gex.BinaryName), outp, withStack)
+	}
+	if gex.LastSuccessTrace != "" {
+		outp := fmt.Sprintf("%v/SUCC_%v", visualFolder, strings.Split(filepath.Base(gex.LastSuccessTrace), ".trace")[0])
+		traceops.ExecVis(gex.LastSuccessTrace, filepath.Join(gex.PrefixDir, "bin", gex.BinaryName), outp, withStack)
+	}
 
-
-  // find the binary file
-  // find the trace file (failed)
-  // find the trace file (success)
-  // create execVis for them
+	// find the binary file
+	// find the trace file (failed)
+	// find the trace file (success)
+	// create execVis for them
 
 }
 
-
-func check(err error){
-	if err != nil{
+func check(err error) {
+	if err != nil {
 		panic(err)
 	}
 }
 
-func handle(err error) string{
-  if err != nil{
-    fmt.Println(err)
-    s := fmt.Sprintf("%v",err)
-    return strings.Split(s,"\n")[0]
-  }
-  return ""
+func handle(err error) string {
+	if err != nil {
+		fmt.Println(err)
+		s := fmt.Sprintf("%v", err)
+		return strings.Split(s, "\n")[0]
+	}
+	return ""
 }
 
 // If s contains e
 func contains(s []string, e string) bool {
-    for _, a := range s {
-        if a == e {
-            return true
-        }
-    }
-    return false
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+	return false
 }
 
-
 func checkFile(filename string) bool {
-  fi, err := os.Stat(filename)
-  return !os.IsNotExist(err) && fi.Size()!=0
+	fi, err := os.Stat(filename)
+	return !os.IsNotExist(err) && fi.Size() != 0
 }

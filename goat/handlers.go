@@ -1,65 +1,62 @@
 package goat
 
 import (
-	"runtime"
-	"time"
-	"runtime/trace"
-	"os"
 	"fmt"
-	"strconv"
 	"log"
+	"os"
+	"runtime"
+	"runtime/trace"
+	"strconv"
+	"time"
 )
 
-func Sched_Handler(){
+func Sched_Handler() {
 	randBound_yield()
-  // other handlers can come down here
+	// other handlers can come down here
 }
 
 func StartRace() {
-  fmt.Println("GOAT start...")
+	fmt.Println("GOAT start...")
 	maxprocs, err := strconv.Atoi(os.Getenv("GOATMAXPROCS"))
-	if err != nil || maxprocs < 1{
+	if err != nil || maxprocs < 1 {
 		panic("Invalid GOATMAXPROCS")
 	}
-  runtime.GOMAXPROCS(maxprocs)
+	runtime.GOMAXPROCS(maxprocs)
 }
 
-
-
-func Start() chan interface{}{
-  fmt.Println("GOAT start...")
+func Start() chan interface{} {
+	fmt.Println("GOAT start...")
 	maxprocs, err := strconv.Atoi(os.Getenv("GOATMAXPROCS"))
-	if err != nil || maxprocs < 1{
+	if err != nil || maxprocs < 1 {
 		panic("Invalid GOATMAXPROCS")
 	}
 	fmt.Println("GOAT_MAXPROCS = ", maxprocs)
-  runtime.GOMAXPROCS(maxprocs)
-  trace.Start(os.Stderr)
-  ch := make(chan interface{})
-  return ch
+	runtime.GOMAXPROCS(maxprocs)
+	trace.Start(os.Stderr)
+	ch := make(chan interface{})
+	return ch
 }
 
-func Watch(ch chan interface{}){
+func Watch(ch chan interface{}) {
 	fmt.Println("GOAT stop...")
 	to, err := strconv.Atoi(os.Getenv("GOATTO"))
-	if err != nil{
+	if err != nil {
 		panic("GOATTO not set")
 	}
-  select {
-  case <- ch:
+	select {
+	case <-ch:
 		fmt.Println("GOAT finished (normal)")
 		ch <- 0
 
-  case <- time.After(time.Second * time.Duration(to)):
-    trace.Stop()
-    fmt.Println("GOAT stopped (timeout)")
-    os.Exit(0)
-  }
+	case <-time.After(time.Second * time.Duration(to)):
+		trace.Stop()
+		fmt.Println("GOAT stopped (timeout)")
+		os.Exit(0)
+	}
 }
 
-
-func Stop(ch chan interface{}){
-	if err := recover() ; err != nil{
+func Stop(ch chan interface{}) {
+	if err := recover(); err != nil {
 		// an error occured
 		//time.Sleep(time.Millisecond)
 		trace.Stop()

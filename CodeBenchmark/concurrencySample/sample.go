@@ -1,48 +1,48 @@
 package main
 
 import (
-  "sync"
-  "fmt"
+	"fmt"
+	"sync"
 )
 
 func main() {
-  ch := make(chan int)
-  m := sync.Mutex{}
+	ch := make(chan int)
+	m := sync.Mutex{}
 	cv := sync.NewCond(&m)
-  var m1 sync.Mutex
+	var m1 sync.Mutex
 
-  // goroutine 1
-  go func() {
+	// goroutine 1
+	go func() {
 		//time.Sleep(5*time.Millisecond) // simulates computation
-    sleep(5)
-    m1.Lock()
-    cv.L.Lock()
-    cv.Signal()
-    cv.L.Unlock()
-    m1.Unlock()
-  }()
+		sleep(5)
+		m1.Lock()
+		cv.L.Lock()
+		cv.Signal()
+		cv.L.Unlock()
+		m1.Unlock()
+	}()
 
-  // goroutine 2
-  go func() {
-    cv.L.Lock()
-    cv.Wait()
-    cv.L.Unlock()
-    close(ch)
-  }()
+	// goroutine 2
+	go func() {
+		cv.L.Lock()
+		cv.Wait()
+		cv.L.Unlock()
+		close(ch)
+	}()
 
-  // goroutine 3
-  go func(){
+	// goroutine 3
+	go func() {
 		//time.Sleep(5*time.Millisecond) // simulates computation
-    sleep(5)
-    m1.Lock()
-    <-ch
-    x := <-ch
-    m1.Unlock()
-    ch <- x
-  }()
+		sleep(5)
+		m1.Lock()
+		<-ch
+		x := <-ch
+		m1.Unlock()
+		ch <- x
+	}()
 
-  //go new()
-  fmt.Println("End of main!")
+	//go new()
+	fmt.Println("End of main!")
 }
 
 //

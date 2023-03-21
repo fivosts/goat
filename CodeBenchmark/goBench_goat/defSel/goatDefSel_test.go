@@ -8,12 +8,13 @@ func TestGoatDefSel(t *testing.T) {
 		c <- 0
 		c <- 0
 	}()
-	it:for{
+it:
+	for {
 		select {
 		default:
-		case <- c:
+		case <-c:
 			break it
 		}
 	}
-	<- c
+	<-c
 }

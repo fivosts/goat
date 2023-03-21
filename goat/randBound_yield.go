@@ -1,25 +1,25 @@
 package goat
 
 import (
-	"strconv"
+	_ "fmt"
 	"math/rand"
-	"runtime"
-	"time"
 	"os"
+	"runtime"
+	"strconv"
 	"sync"
-	_"fmt"
+	"time"
 )
 
 type SharedCounter struct {
-	cnt    int
+	cnt int
 	sync.Mutex
 }
 
 var bound SharedCounter
 
-func randBound_yield(){
+func randBound_yield() {
 	thr, err := strconv.Atoi(os.Getenv("GOATRSBOUND"))
-	if err != nil || thr < 1{
+	if err != nil || thr < 1 {
 		return
 	}
 
@@ -28,9 +28,9 @@ func randBound_yield(){
 		bound.Lock()
 		if bound.cnt < thr {
 			bound.cnt++
-      bound.Unlock()
-      runtime.Gosched()
-		} else{
+			bound.Unlock()
+			runtime.Gosched()
+		} else {
 			bound.Unlock()
 		}
 	}

@@ -1,6 +1,5 @@
 package main
 
-
-func test()string{
+func test() string {
 	return "Test"
 }

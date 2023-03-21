@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	for _, type_ := range []gobench.SubBenchType{gobench.GoKerNonBlocking, gobench.GoKerBlocking} {
+	for _, type_ := range []gobench.SubBenchType{gobench.GoKerNonBlocking, gobench.GoKerBlocking, gobench.GoRealNonBlocking, gobench.GoRealBlocking} {
 		s := gobench.NewSuite(gobench.SuiteConfig{
 			ExecEnvConfig: gobench.ExecEnvConfig{
 				Count:   1,
@@ -26,25 +26,24 @@ func main() {
 					}
 				},
 			},
-			Type: type_,
+			Type:   type_,
+			BugIDs: []string{"etcd_11982"},
 		})
 		s.Run()
 		bugs := s.BugSet.ListByTypes(type_)
 		println(bugs[len(bugs)-1].ID)
 		for _, b := range bugs {
-			result := s.GetResult(b.ID)
-			//fmt.Println(b.ID, "logs ->", filepath.Join(result.OutputDir, "full.log"))
 			pathToTrace := utils.PathToTrace(b.Type.String(), b.SubType, b.SubSubType, b.ID)
-			if result.IsPositive() {
-				fmt.Printf("OK, we reproduced %s in GoBench (GoKer)\n", b.ID)
+			if s.GetResult(b.ID).IsPositive() {
+				fmt.Printf("OK, we reproduced %s in GoBench\n", b.ID)
 				trason.Trason(pathToTrace)
 			} else {
-				fmt.Printf("Sorry, we failed to reproduce %s in GoBench (GoKer)\n", b.ID)
+				fmt.Printf("Sorry, we failed to reproduce %s in GoBench\n", b.ID)
 				if err := os.Remove(pathToTrace); err != nil {
 					panic(err)
 				}
 			}
 		}
-		println("Done")
+		fmt.Println("Finished", type_)
 	}
 }

@@ -2,8 +2,8 @@ package goatSafeInc
 
 import (
 	"sync"
+	"testing"
 	"time"
-  "testing"
 )
 
 // SafeCounter is safe to use concurrently.
@@ -33,7 +33,6 @@ func TestGoatSafeInc(t *testing.T) {
 		go c.Inc("somekey")
 	}
 
-
-  c.Value("somekey")
-  time.Sleep(time.Second)
+	c.Value("somekey")
+	time.Sleep(time.Second)
 }

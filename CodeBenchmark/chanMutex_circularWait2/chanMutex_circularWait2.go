@@ -1,9 +1,9 @@
 package main
 
 import (
-  "time"
-  "sync"
-  "fmt"
+	"fmt"
+	"sync"
+	"time"
 )
 
 // https://github.com/kubernetes/kubernetes/pull/16223
@@ -23,44 +23,44 @@ import (
 // lock //block
 
 func main() {
-  ch1 := make(chan int)
-  stop := make(chan int)
-  var m sync.Mutex
+	ch1 := make(chan int)
+	stop := make(chan int)
+	var m sync.Mutex
 
-  // goroutine 1
-  go func(){
-    for {
-      select{
-      case <- stop: // terminate
-        <- stop
-        return
-      case stop <- 0:
-        return 
-      default:
-      }
-      <- ch1
-      m.Lock()
-      m.Unlock()
-      <- ch1
-    }
-  }()
+	// goroutine 1
+	go func() {
+		for {
+			select {
+			case <-stop: // terminate
+				<-stop
+				return
+			case stop <- 0:
+				return
+			default:
+			}
+			<-ch1
+			m.Lock()
+			m.Unlock()
+			<-ch1
+		}
+	}()
 
-  // goroutine 2
-  go func() {
-    m.Lock()
-    ch1 <- 1
-    m.Unlock()
-    stop <- 1
-  }()
+	// goroutine 2
+	go func() {
+		m.Lock()
+		ch1 <- 1
+		m.Unlock()
+		stop <- 1
+	}()
 
-  // goroutine 3
-  go func() {
-    m.Lock()
-    ch1 <- 1
-    m.Unlock()
-    stop <- 1
-  }()
+	// goroutine 3
+	go func() {
+		m.Lock()
+		ch1 <- 1
+		m.Unlock()
+		stop <- 1
+	}()
 
-  time.Sleep(time.Second)
-  fmt.Println("End of main!")
+	time.Sleep(time.Second)
+	fmt.Println("End of main!")
 }

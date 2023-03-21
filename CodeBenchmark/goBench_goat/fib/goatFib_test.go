@@ -19,7 +19,7 @@ func TestGoatFib(t *testing.T) {
 	quit := make(chan int)
 	go func() {
 		for i := 0; i < 10; i++ {
-      <-c
+			<-c
 		}
 		quit <- 0
 	}()

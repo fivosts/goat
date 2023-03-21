@@ -12,6 +12,9 @@ import (
 
 func Trason(filepath string) {
 	traceFile, err := os.Open(filepath)
+	if err != nil {
+		panic(err)
+	}
 	fi, err := traceFile.Stat()
 	if err != nil {
 		panic(err)

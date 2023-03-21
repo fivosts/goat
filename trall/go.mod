@@ -1,6 +1,6 @@
 module trall
 
-go 1.13.5
+go 1.20
 
 require github.com/timmyyuan/gobench v0.0.0-20220715072643-c10c60baa874
 

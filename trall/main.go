@@ -3,11 +3,8 @@ package main
 import (
 	"fmt"
 	"github.com/timmyyuan/gobench"
-	"os"
 	"strings"
 	"time"
-	"trall/trason"
-	"trall/utils"
 )
 
 func main() {
@@ -29,19 +26,6 @@ func main() {
 			Type: type_,
 		})
 		s.Run()
-		bugs := s.BugSet.ListByTypes(type_)
-		for _, b := range bugs {
-			pathToTrace := utils.PathToTrace(b.Type.String(), b.SubType, b.SubSubType, b.ID)
-			if s.GetResult(b.ID).IsPositive() {
-				fmt.Printf("OK, we reproduced %s in GoBench\n", b.ID)
-				trason.Trason(pathToTrace)
-			} else {
-				fmt.Printf("Sorry, we failed to reproduce %s in GoBench\n", b.ID)
-				if err := os.Remove(pathToTrace); err != nil {
-					panic(err)
-				}
-			}
-		}
 		fmt.Println("Finished", type_)
 	}
 }

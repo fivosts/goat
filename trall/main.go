@@ -15,6 +15,9 @@ func main() {
 				Timeout: 5 * time.Second,
 				Repeat:  1,
 				PositiveCheckFunc: func(r *gobench.SingleRunResult) bool {
+					if r.Bug.SubType == "Resource Deadlock" {
+						return strings.Contains(string(r.Logs), "semacquire")
+					}
 					switch r.Bug.SubSubType {
 					case "Data race":
 						return strings.Contains(string(r.Logs), "DATA RACE")

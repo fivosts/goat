@@ -10,8 +10,15 @@ import (
 	"trall/trace"
 )
 
-func Trason(filepath string) {
-	traceFile, err := os.Open(filepath)
+func Trason(paths ...string) {
+	pathToTrace := paths[0]
+	var pathToJSON string
+	if len(paths) > 1 {
+		pathToJSON = paths[1]
+	} else {
+		pathToJSON = strings.Replace(pathToTrace, ".trace", ".json", 1)
+	}
+	traceFile, err := os.Open(pathToTrace)
 	if err != nil {
 		panic(err)
 	}
@@ -27,15 +34,20 @@ func Trason(filepath string) {
 	if err != nil {
 		if err.Error() == "trace is empty" {
 			fmt.Println("Trace file is empty, deleting...")
-			if err = os.Remove(filepath); err != nil {
+			if err = os.Remove(pathToTrace); err != nil {
 				panic(err)
 			}
+		} else {
+			panic(err)
 		}
 	}
 	if err := traceFile.Close(); err != nil {
 		panic(err)
 	}
-	jsonFile, err := os.Create(strings.Replace(filepath, ".trace", ".json", 1))
+	jsonFile, err := os.Create(pathToJSON)
+	if err != nil {
+		panic(err)
+	}
 	w := bufio.NewWriter(jsonFile)
 	if _, err = w.WriteString(`{"events": [`); err != nil {
 		panic(err)

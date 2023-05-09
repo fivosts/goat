@@ -1,5 +1,0 @@
-
-use (
-	./trall
-	./gobench
-)

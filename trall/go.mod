@@ -1,4 +1,4 @@
-module trall
+module example.com/me/trall
 
 go 1.20
 
